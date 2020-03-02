@@ -35,7 +35,27 @@ export class WorldScene extends Phaser.Scene {
     this.physics.add.collider(this.player, interact);
     interact.setCollisionByProperty({ collides: true });
 
-    ///////////////////// End of Collisions
+    ///////////////////// Map Events
+    // Cross Bridge
+    structures.setTileIndexCallback([267, 269], () => {
+      // Callback
+      console.info("Crossing Bridge");
+
+      // Remove Callback to Stop Recursion
+      structures.setTileIndexCallback([267, 269], null);
+    });
+
+    // Fishing Pole
+    interact.setTileLocationCallback(10, 13, 1, 1, () => {
+      console.info("Hitting Rod");
+      interact.setTileLocationCallback(10, 13, 1, 1, null);
+    });
+
+    // Cart Merchant
+    interact.setTileLocationCallback(15, 7, 3, 1, () => {
+      console.info("Hitting Merchant");
+      interact.setTileLocationCallback(15, 7, 3, 1, null);
+    });
 
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
