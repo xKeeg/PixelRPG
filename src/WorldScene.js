@@ -41,7 +41,7 @@ export class WorldScene extends Phaser.Scene {
     // Cross Bridge
     structures.setTileIndexCallback([267, 269], () => {
       // Callback
-      console.info("Crossing Bridge");
+      this.dialogPrompt("The Cart Merchant calls you over...");
 
       // Remove Callback to Stop Recursion
       structures.setTileIndexCallback([267, 269], null);
@@ -55,13 +55,15 @@ export class WorldScene extends Phaser.Scene {
 
     // Zone 1 Sign
     interact.setTileLocationCallback(2, 2, 1, 1, () => {
-      alert("Welcome");
+      this.dialogPrompt("This isn't Kansas...");
+
       interact.setTileLocationCallback(2, 2, 1, 1, null);
     });
 
     // Cart Merchant
     interact.setTileLocationCallback(15, 7, 3, 1, () => {
-      console.info("Hitting Merchant");
+      this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
+
       interact.setTileLocationCallback(15, 7, 3, 1, null);
     });
 
@@ -96,6 +98,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   update() {
+    console.dir(this.cursors);
     this.player.body.setVelocity(0);
     // Movement
     if (this.cursors.left.isDown) {
@@ -141,7 +144,11 @@ export class WorldScene extends Phaser.Scene {
     this.scene.add("Dialog", dialogBox);
 
     // Stop stepping main scene
+    this.input.keyboard.resetKeys();
     this.scene.pause("WorldScene");
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Draw Dialog Ovelay
     this.scene.launch("Dialog");
   }
 }
