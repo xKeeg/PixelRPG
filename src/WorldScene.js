@@ -1,4 +1,5 @@
 import { Player } from "./Player";
+import { Dialog } from "./Dialog";
 
 export class WorldScene extends Phaser.Scene {
   constructor() {
@@ -14,6 +15,7 @@ export class WorldScene extends Phaser.Scene {
 
     // Make Layers
     var ground = map.createStaticLayer("Ground", tiles, 0, 0);
+    var groundDeco = map.createStaticLayer("GroundDeco", tiles, 0, 0);
     var water = map.createStaticLayer("Water", tiles, 0, 0);
     var structures = map.createStaticLayer("Structures", tiles, 0, 0);
     this.player = new Player(this, 100, 120);
@@ -47,8 +49,14 @@ export class WorldScene extends Phaser.Scene {
 
     // Fishing Pole
     interact.setTileLocationCallback(10, 13, 1, 1, () => {
-      console.info("Hitting Rod");
+      this.dialogPrompt("You don't need this yet!");
       interact.setTileLocationCallback(10, 13, 1, 1, null);
+    });
+
+    // Zone 1 Sign
+    interact.setTileLocationCallback(2, 2, 1, 1, () => {
+      alert("Welcome");
+      interact.setTileLocationCallback(2, 2, 1, 1, null);
     });
 
     // Cart Merchant
@@ -125,5 +133,15 @@ export class WorldScene extends Phaser.Scene {
 
     // shake world
     this.cameras.main.shake(400);
+  }
+
+  dialogPrompt(text) {
+    // Create a Dialogue Box
+    const dialogBox = new Dialog(text);
+    this.scene.add("Dialog", dialogBox);
+
+    // Stop stepping main scene
+    this.scene.pause("WorldScene");
+    this.scene.launch("Dialog");
   }
 }
