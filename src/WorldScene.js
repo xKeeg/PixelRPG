@@ -1,5 +1,6 @@
 import { Player } from "./Player";
 import { Dialog } from "./Dialog";
+import { Progression } from "./Progression";
 
 export class WorldScene extends Phaser.Scene {
   constructor() {
@@ -7,8 +8,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
-    // Player Character
-
+    this.Progress = new Progression();
     // Map Stuff
     var map = this.make.tilemap({ key: "map" });
     var tiles = map.addTilesetImage("spritesheet", "tiles");
@@ -23,7 +23,7 @@ export class WorldScene extends Phaser.Scene {
     var interact = map.createStaticLayer("Interact", tiles, 0, 0);
     var decorations = map.createStaticLayer("Decoration", tiles, 0, 0);
 
-    ///////////////////// Make Collisions
+    /********** Make Collisions ***********/
 
     // Buildings, Trees etc
     this.physics.add.collider(this.player, structures);
@@ -37,70 +37,102 @@ export class WorldScene extends Phaser.Scene {
     this.physics.add.collider(this.player, interact);
     interact.setCollisionByProperty({ collides: true });
 
-    ///////////////////// Map Events
+    /********** Map Events  ***********/
     // Cross Bridge
     structures.setTileIndexCallback([267, 269], () => {
-      // Callback
       this.dialogPrompt("The Cart Merchant calls you over...");
-
-      // Remove Callback to Stop Recursion
+      this.Progress.Story.hasBegun = true;
       structures.setTileIndexCallback([267, 269], null);
     });
 
     // Fishing Pole
     interact.setTileLocationCallback(10, 13, 1, 1, () => {
-      this.dialogPrompt("You don't need this yet!");
-      interact.setTileLocationCallback(10, 13, 1, 1, null);
+      if (this.Progress.Story.hasBegun === false) {
+        this.dialogPrompt("You don't need this yet!");
+      } else {
+        this.dialogPrompt("You caught a fish! Yuk!");
+        this.Progress.Story.caughtFish = true;
+      }
     });
 
     // Zone 1 Sign
     interact.setTileLocationCallback(2, 2, 1, 1, () => {
       this.dialogPrompt("This isn't Kansas...");
-
       interact.setTileLocationCallback(2, 2, 1, 1, null);
     });
 
     // Cart Merchant
     interact.setTileLocationCallback(15, 7, 3, 1, () => {
-      this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
-
-      interact.setTileLocationCallback(15, 7, 3, 1, null);
+      if (this.Progress.Story.caughtFish === false) {
+        this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
+      } else {
+        this.dialogPrompt("You take the axe. It smells worse than the fish...");
+      }
     });
 
+    // Setup world size
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
     this.player.setCollideWorldBounds(true);
 
+    // Create Keyboard input
     this.cursors = this.input.keyboard.createCursorKeys();
 
+    // Camera Follows Player
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
-
     this.player.createAnims(this);
 
-    this.spawns = this.physics.add.group({
-      classType: Phaser.GameObjects.Zone
-    });
-    for (var i = 0; i < 1; i++) {
-      var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-      var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-      // x, y, spawn-width, spawn-height
-      this.spawns.create(x, y, 20, 20);
-    }
-    this.physics.add.overlap(
-      this.player,
-      this.spawns,
-      this.onMeetEnemy,
-      false,
-      this
-    );
+    // ENEMY LOGIC
+    // this.spawns = this.physics.add.group({
+    //   classType: Phaser.GameObjects.Zone
+    // });
+    // for (var i = 0; i < 1; i++) {
+    //   var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+    //   var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+    //   // x, y, spawn-width, spawn-height
+    //   this.spawns.create(x, y, 20, 20);
+    // }
+    // this.physics.add.overlap(
+    //   this.player,
+    //   this.spawns,
+    //   this.onMeetEnemy,
+    //   false,
+    //   this
+    // );
   }
 
   update() {
-    console.dir(this.cursors);
+    this.playerMovementHandler();
+  }
+
+  onMeetEnemy(player, zone) {
+    // move zone to different location
+    zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+
+    // shake world
+    this.cameras.main.shake(400);
+  }
+
+  dialogPrompt(text) {
+    // Create a Dialogue Box
+    const dialogBox = new Dialog(text);
+    this.scene.add("Dialog", dialogBox);
+
+    // Stop stepping main scene
+    this.input.keyboard.resetKeys();
+    this.scene.pause("WorldScene");
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Draw Dialog Ovelay
+    this.scene.launch("Dialog");
+  }
+
+  playerMovementHandler() {
     this.player.body.setVelocity(0);
-    // Movement
+
     if (this.cursors.left.isDown) {
       this.player.body.setVelocityX(-80);
     } else if (this.cursors.right.isDown) {
@@ -127,28 +159,5 @@ export class WorldScene extends Phaser.Scene {
     } else {
       this.player.anims.stop();
     }
-  }
-
-  onMeetEnemy(player, zone) {
-    // move zone to different location
-    zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-
-    // shake world
-    this.cameras.main.shake(400);
-  }
-
-  dialogPrompt(text) {
-    // Create a Dialogue Box
-    const dialogBox = new Dialog(text);
-    this.scene.add("Dialog", dialogBox);
-
-    // Stop stepping main scene
-    this.input.keyboard.resetKeys();
-    this.scene.pause("WorldScene");
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    // Draw Dialog Ovelay
-    this.scene.launch("Dialog");
   }
 }
