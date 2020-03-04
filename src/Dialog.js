@@ -5,10 +5,10 @@ export class Dialog extends Phaser.Scene {
   }
 
   create() {
-    this.dialogCursors = this.input.keyboard.createCursorKeys();
-
     const centerX = this.cameras.main.displayWidth / 2;
     const centerY = this.cameras.main.displayHeight / 2;
+
+    this.keyReleased = false;
 
     // Draw Dialogue Background Box
     const background = this.add
@@ -31,13 +31,26 @@ export class Dialog extends Phaser.Scene {
 
     // Stop scrolling with tilemap
     dialog.setScrollFactor(0);
-  }
 
-  update() {
-    let isSpaceDown = this.dialogCursors.space.isDown;
-    if (isSpaceDown) {
-      this.scene.remove("Dialog");
-      this.scene.resume("WorldScene");
-    }
+    this.input.keyboard.on(
+      "keyup",
+      function(event) {
+        this.keyReleased = true;
+      },
+      this
+    );
+
+    // Set Delete Callback
+    this.input.keyboard.on(
+      "keydown",
+      function(event) {
+        if (this.keyReleased != false) {
+          const mainScene = this.scene.get("WorldScene");
+          mainScene.toggleFocus();
+          this.scene.remove("Dialog");
+        }
+      },
+      this
+    );
   }
 }

@@ -9,6 +9,7 @@ export class WorldScene extends Phaser.Scene {
 
   create() {
     this.Progress = new Progression();
+    this.isPaused = false;
     // Map Stuff
     var map = this.make.tilemap({ key: "map" });
     var tiles = map.addTilesetImage("spritesheet", "tiles");
@@ -70,6 +71,15 @@ export class WorldScene extends Phaser.Scene {
       }
     });
 
+    // Zone 1 Chest
+    interact.setTileLocationCallback(1, 16, 2, 1, () => {
+      if (this.Progress.Story.hasZone1Key === false) {
+        this.dialogPrompt("LOCKED! *Gotta find the key!*");
+      } else {
+        this.dialogPrompt("plc");
+      }
+    });
+
     // Setup world size
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
@@ -105,6 +115,7 @@ export class WorldScene extends Phaser.Scene {
 
   update() {
     this.playerMovementHandler();
+    console.log(this.isPaused);
   }
 
   onMeetEnemy(player, zone) {
@@ -116,16 +127,18 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.shake(400);
   }
 
+  toggleFocus(force = false) {
+    if (force) {
+      this.isPaused = false;
+    } else this.isPaused = !this.isPaused;
+  }
+
   dialogPrompt(text) {
     // Create a Dialogue Box
     const dialogBox = new Dialog(text);
     this.scene.add("Dialog", dialogBox);
 
-    // Stop stepping main scene
-    this.input.keyboard.resetKeys();
-    this.scene.pause("WorldScene");
-    this.cursors = this.input.keyboard.createCursorKeys();
-
+    this.isPaused = true;
     // Draw Dialog Ovelay
     this.scene.launch("Dialog");
   }
@@ -133,31 +146,33 @@ export class WorldScene extends Phaser.Scene {
   playerMovementHandler() {
     this.player.body.setVelocity(0);
 
-    if (this.cursors.left.isDown) {
-      this.player.body.setVelocityX(-80);
-    } else if (this.cursors.right.isDown) {
-      this.player.body.setVelocityX(80);
-    }
+    if (!this.isPaused) {
+      if (this.cursors.left.isDown) {
+        this.player.body.setVelocityX(-80);
+      } else if (this.cursors.right.isDown) {
+        this.player.body.setVelocityX(80);
+      }
 
-    if (this.cursors.up.isDown) {
-      this.player.body.setVelocityY(-80);
-    } else if (this.cursors.down.isDown) {
-      this.player.body.setVelocityY(80);
-    }
+      if (this.cursors.up.isDown) {
+        this.player.body.setVelocityY(-80);
+      } else if (this.cursors.down.isDown) {
+        this.player.body.setVelocityY(80);
+      }
 
-    // Anims
-    if (this.cursors.left.isDown) {
-      this.player.anims.play("left", true);
-      this.player.flipX = true;
-    } else if (this.cursors.right.isDown) {
-      this.player.anims.play("right", true);
-      this.player.flipX = false;
-    } else if (this.cursors.up.isDown) {
-      this.player.anims.play("up", true);
-    } else if (this.cursors.down.isDown) {
-      this.player.anims.play("down", true);
-    } else {
-      this.player.anims.stop();
-    }
+      // Anims
+      if (this.cursors.left.isDown) {
+        this.player.anims.play("left", true);
+        this.player.flipX = true;
+      } else if (this.cursors.right.isDown) {
+        this.player.anims.play("right", true);
+        this.player.flipX = false;
+      } else if (this.cursors.up.isDown) {
+        this.player.anims.play("up", true);
+      } else if (this.cursors.down.isDown) {
+        this.player.anims.play("down", true);
+      } else {
+        this.player.anims.stop();
+      }
+    } else this.player.anims.stop();
   }
 }
