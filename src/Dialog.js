@@ -46,8 +46,8 @@ export class Dialog extends Phaser.Scene {
       function(event) {
         if (this.keyReleased != false) {
           const mainScene = this.scene.get("WorldScene");
-          mainScene.toggleFocus();
           this.scene.remove("Dialog");
+          mainScene.toggleFocus();
         }
       },
       this

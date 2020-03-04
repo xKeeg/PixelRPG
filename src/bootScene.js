@@ -2,6 +2,7 @@ import mapSpritesheet from "./assets/spritesheet.png";
 import playerSpritesheet from "./assets/RPG_assets.png";
 import TiledJSON from "./assets/map.json";
 import UIBox from "./assets/UI_box.png";
+import Adventurer from "./assets/Character 1.png";
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -17,6 +18,10 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet("player", playerSpritesheet, {
       frameWidth: 16,
       frameHeight: 16
+    });
+    this.load.spritesheet("person", Adventurer, {
+      frameWidth: 24,
+      frameHeight: 32
     });
   }
 

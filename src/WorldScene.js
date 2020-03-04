@@ -19,10 +19,10 @@ export class WorldScene extends Phaser.Scene {
     var groundDeco = map.createStaticLayer("GroundDeco", tiles, 0, 0);
     var water = map.createStaticLayer("Water", tiles, 0, 0);
     var structures = map.createStaticLayer("Structures", tiles, 0, 0);
-    this.player = new Player(this, 100, 120);
-    var fringe = map.createStaticLayer("Fringe", tiles, 0, 0);
     var interact = map.createStaticLayer("Interact", tiles, 0, 0);
     var decorations = map.createStaticLayer("Decoration", tiles, 0, 0);
+    this.player = new Player(this, 100, 120);
+    var fringe = map.createStaticLayer("Fringe", tiles, 0, 0);
 
     /********** Make Collisions ***********/
 
@@ -115,7 +115,6 @@ export class WorldScene extends Phaser.Scene {
 
   update() {
     this.playerMovementHandler();
-    console.log(this.isPaused);
   }
 
   onMeetEnemy(player, zone) {
@@ -138,7 +137,9 @@ export class WorldScene extends Phaser.Scene {
     const dialogBox = new Dialog(text);
     this.scene.add("Dialog", dialogBox);
 
+    // Set game is Paused
     this.isPaused = true;
+
     // Draw Dialog Ovelay
     this.scene.launch("Dialog");
   }
@@ -159,19 +160,24 @@ export class WorldScene extends Phaser.Scene {
         this.player.body.setVelocityY(80);
       }
 
+      const directionEnum = { LEFT: 13, RIGHT: 14, UP: 11, DOWN: 12 };
       // Anims
       if (this.cursors.left.isDown) {
         this.player.anims.play("left", true);
-        this.player.flipX = true;
       } else if (this.cursors.right.isDown) {
         this.player.anims.play("right", true);
-        this.player.flipX = false;
       } else if (this.cursors.up.isDown) {
         this.player.anims.play("up", true);
       } else if (this.cursors.down.isDown) {
         this.player.anims.play("down", true);
-      } else {
-        this.player.anims.stop();
+      } else if (this.player.body.facing === directionEnum.LEFT) {
+        this.player.anims.play("idleLeft", true);
+      } else if (this.player.body.facing === directionEnum.RIGHT) {
+        this.player.anims.play("idleRight", true);
+      } else if (this.player.body.facing === directionEnum.UP) {
+        this.player.anims.play("idleUp", true);
+      } else if (this.player.body.facing === directionEnum.DOWN) {
+        this.player.anims.play("idleDown", true);
       }
     } else this.player.anims.stop();
   }
