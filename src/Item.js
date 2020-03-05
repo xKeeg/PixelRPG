@@ -7,6 +7,7 @@ export class Item extends Phaser.Physics.Arcade.Sprite {
 
     this.setScale(0.5);
     this.setDepth(5);
+    this.setOrigin(0.5, 0.5);
 
     this.setInteractive();
     scene.add.existing(this);

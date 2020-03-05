@@ -35,6 +35,7 @@ export class WorldScene extends Phaser.Scene {
     this.player.createAnims(this);
 
     this.inventory.addItem("axe", "tmp");
+    this.inventory.addItem("key", "tmp2");
   }
 
   update() {
@@ -215,16 +216,35 @@ export class WorldScene extends Phaser.Scene {
   }
 
   useItem(item) {
-    let merchantTiles = this.interact.getTilesWithin(15, 5, 3, 3);
-    console.log(merchantTiles[0]);
+    // Get the designated use location of the item
+    const location = this.Progress.ItemUseLocations[item.name].useLocation;
 
-    let itemOffsetCamera = this.cameras.main.getWorldPoint(item.x, item.y);
+    // Get the object from Progress
+    const objLocation = this.Progress.Locations[location];
 
+    // Readability
+    const TopLeftXInteract = objLocation.x;
+    const TopLeftYInteract = objLocation.y;
+    const width = objLocation.width;
+    const height = objLocation.height;
+
+    const interactableTiles = this.interact.getTilesWithin(
+      TopLeftXInteract,
+      TopLeftYInteract,
+      width,
+      height
+    );
+    let count = interactableTiles.length;
+
+    // As the camera pans the x,y of items changes. This get's the original x,y
+    const itemOffsetCamera = this.cameras.main.getWorldPoint(item.x, item.y);
+
+    // Offset 16 to allow for tile size
     if (
-      itemOffsetCamera.x > merchantTiles[0].pixelX &&
-      itemOffsetCamera.y > merchantTiles[0].pixelY &&
-      itemOffsetCamera.x < merchantTiles[8].pixelX &&
-      itemOffsetCamera.y < merchantTiles[8].pixelY
+      itemOffsetCamera.x > interactableTiles[0].pixelX &&
+      itemOffsetCamera.y > interactableTiles[0].pixelY &&
+      itemOffsetCamera.x < interactableTiles[count - 1].pixelX + 16 &&
+      itemOffsetCamera.y < interactableTiles[count - 1].pixelY + 16
     ) {
       return true;
     } else return false;
