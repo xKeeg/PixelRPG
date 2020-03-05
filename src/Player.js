@@ -1,5 +1,3 @@
-import { LEFT, RIGHT } from "phaser";
-
 export class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     let texture = "person";

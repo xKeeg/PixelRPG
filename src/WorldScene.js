@@ -9,11 +9,143 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
+    const INV = this.scene.get("Inventory");
     this.Progress = new Progression();
-    this.Inventory = new Inventory();
+    this.scene.launch("Inventory");
+
+    // Global Pause State
     this.isPaused = false;
-    // Map Stuff
+
+    // Load map from file
     var map = this.make.tilemap({ key: "map" });
+    this.createMapAndCollisions(map);
+
+    // Create Keyboard input
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Set bounds to map width not screen width
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    // Camera Follows Player
+    this.cameras.main.startFollow(this.player);
+    this.cameras.main.roundPixels = true;
+    this.player.createAnims(this);
+
+    // Initialise Game Storage Classes
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+    INV.addItem("axe", "tmp");
+  }
+
+  update() {
+    this.playerMovementHandler();
+  }
+
+  toggleFocus(force = false) {
+    if (force) {
+      this.isPaused = false;
+    } else this.isPaused = !this.isPaused;
+  }
+
+  dialogPrompt(text) {
+    // Create a Dialogue Box
+    const dialogBox = new Dialog(text);
+    this.scene.add("Dialog", dialogBox);
+
+    // Set game is Paused
+    this.isPaused = true;
+
+    // Draw Dialog Ovelay
+    this.scene.launch("Dialog");
+  }
+
+  playerMovementHandler() {
+    this.player.body.setVelocity(0);
+
+    // Get Center of visible screen
+    let centerX = this.cameras.main.displayWidth / 2;
+    let centerY = this.cameras.main.displayHeight / 2;
+
+    // If Player is offset centre of screen (edge of map) then recalibrate touch input
+    // TODO :: Currently handles top and left bounds, implement bottom and right bounds.
+
+    centerX = Math.min(centerX, this.player.x);
+    centerY = Math.min(centerY, this.player.y);
+
+    // Adjusts boundaries for touch input detection
+    const inputSensitivity = 0.15;
+    const screen = {
+      left: centerX * (1 - inputSensitivity),
+      right: centerX * (1 + inputSensitivity),
+      up: centerY * (1 - inputSensitivity),
+      down: centerY * (1 + inputSensitivity)
+    };
+
+    // Facing Direction with regard to Phaser.Const...
+    const directionEnum = { LEFT: 13, RIGHT: 14, UP: 11, DOWN: 12 };
+
+    var pointer = this.input.activePointer;
+    if (pointer.isDown) {
+      var touchX = pointer.x;
+      var touchY = pointer.y;
+    } else touchX = touchY = undefined;
+
+    // console.log("X: " + touchX);
+    // console.log("Y: " + touchY);
+
+    if (!this.isPaused) {
+      if (this.cursors.left.isDown || touchX < screen.left) {
+        this.player.body.setVelocityX(-80);
+      } else if (this.cursors.right.isDown || touchX > screen.right) {
+        this.player.body.setVelocityX(80);
+      }
+
+      if (this.cursors.up.isDown || touchY < screen.up) {
+        this.player.body.setVelocityY(-80);
+      } else if (this.cursors.down.isDown || touchY > screen.down) {
+        this.player.body.setVelocityY(80);
+      }
+
+      // Anims
+      if (this.cursors.left.isDown) {
+        this.player.anims.play("left", true);
+      } else if (this.cursors.right.isDown) {
+        this.player.anims.play("right", true);
+      } else if (this.cursors.up.isDown) {
+        this.player.anims.play("up", true);
+      } else if (this.cursors.down.isDown) {
+        this.player.anims.play("down", true);
+      } else if (this.player.body.facing === directionEnum.LEFT) {
+        this.player.anims.play("idleLeft", true);
+      } else if (this.player.body.facing === directionEnum.RIGHT) {
+        this.player.anims.play("idleRight", true);
+      } else if (this.player.body.facing === directionEnum.UP) {
+        this.player.anims.play("idleUp", true);
+      } else if (this.player.body.facing === directionEnum.DOWN) {
+        this.player.anims.play("idleDown", true);
+      }
+    } else {
+      if (this.player.body.facing === directionEnum.LEFT) {
+        this.player.anims.play("idleLeft", true);
+      } else if (this.player.body.facing === directionEnum.RIGHT) {
+        this.player.anims.play("idleRight", true);
+      } else if (this.player.body.facing === directionEnum.UP) {
+        this.player.anims.play("idleUp", true);
+      } else if (this.player.body.facing === directionEnum.DOWN) {
+        this.player.anims.play("idleDown", true);
+      }
+    }
+  }
+
+  createMapAndCollisions(map) {
     var tiles = map.addTilesetImage("spritesheet", "tiles");
 
     // Make Layers
@@ -61,7 +193,6 @@ export class WorldScene extends Phaser.Scene {
     // Zone 1 Sign
     interact.setTileLocationCallback(2, 2, 1, 1, () => {
       this.dialogPrompt("This isn't Kansas...");
-      interact.setTileLocationCallback(2, 2, 1, 1, null);
     });
 
     // Cart Merchant
@@ -86,130 +217,5 @@ export class WorldScene extends Phaser.Scene {
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
     this.player.setCollideWorldBounds(true);
-
-    // Create Keyboard input
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    // Camera Follows Player
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.startFollow(this.player);
-    this.cameras.main.roundPixels = true;
-    this.player.createAnims(this);
-
-    // ENEMY LOGIC
-    // this.spawns = this.physics.add.group({
-    //   classType: Phaser.GameObjects.Zone
-    // });
-    // for (var i = 0; i < 1; i++) {
-    //   var x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    //   var y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-    //   // x, y, spawn-width, spawn-height
-    //   this.spawns.create(x, y, 20, 20);
-    // }
-    // this.physics.add.overlap(
-    //   this.player,
-    //   this.spawns,
-    //   this.onMeetEnemy,
-    //   false,
-    //   this
-    // );
-    this.scene.add("Inventory", Inventory);
-    this.scene.launch("Inventory");
-  }
-
-  update() {
-    this.playerMovementHandler();
-  }
-
-  onMeetEnemy(player, zone) {
-    // move zone to different location
-    zone.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    zone.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
-
-    // shake world
-    this.cameras.main.shake(400);
-  }
-
-  toggleFocus(force = false) {
-    if (force) {
-      this.isPaused = false;
-    } else this.isPaused = !this.isPaused;
-  }
-
-  dialogPrompt(text) {
-    // Create a Dialogue Box
-    const dialogBox = new Dialog(text);
-    this.scene.add("Dialog", dialogBox);
-
-    // Set game is Paused
-    this.isPaused = true;
-
-    // Draw Dialog Ovelay
-    this.scene.launch("Dialog");
-  }
-
-  playerMovementHandler() {
-    this.player.body.setVelocity(0);
-
-    // Get Center of visible screen
-    let centerX = this.cameras.main.displayWidth / 2;
-    let centerY = this.cameras.main.displayHeight / 2;
-
-    // If Player is offset centre of screen (edge of map) then recalibrate touch input
-    // TODO :: Currently handles top and left bounds, implement bottom and right bounds.
-
-    centerX = Math.min(centerX, this.player.x);
-    centerY = Math.min(centerY, this.player.y);
-
-    const inputSensitivity = 0.15;
-    const screen = {
-      left: centerX * (1 - inputSensitivity),
-      right: centerX * (1 + inputSensitivity),
-      up: centerY * (1 - inputSensitivity),
-      down: centerY * (1 + inputSensitivity)
-    };
-
-    var pointer = this.input.activePointer;
-    if (pointer.isDown) {
-      var touchX = pointer.x;
-      var touchY = pointer.y;
-    } else touchX = touchY = undefined;
-
-    // console.log("X: " + touchX);
-    // console.log("Y: " + touchY);
-
-    if (!this.isPaused) {
-      if (this.cursors.left.isDown || touchX < screen.left) {
-        this.player.body.setVelocityX(-80);
-      } else if (this.cursors.right.isDown || touchX > screen.right) {
-        this.player.body.setVelocityX(80);
-      }
-
-      if (this.cursors.up.isDown || touchY < screen.up) {
-        this.player.body.setVelocityY(-80);
-      } else if (this.cursors.down.isDown || touchY > screen.down) {
-        this.player.body.setVelocityY(80);
-      }
-
-      const directionEnum = { LEFT: 13, RIGHT: 14, UP: 11, DOWN: 12 };
-      // Anims
-      if (this.cursors.left.isDown) {
-        this.player.anims.play("left", true);
-      } else if (this.cursors.right.isDown) {
-        this.player.anims.play("right", true);
-      } else if (this.cursors.up.isDown) {
-        this.player.anims.play("up", true);
-      } else if (this.cursors.down.isDown) {
-        this.player.anims.play("down", true);
-      } else if (this.player.body.facing === directionEnum.LEFT) {
-        this.player.anims.play("idleLeft", true);
-      } else if (this.player.body.facing === directionEnum.RIGHT) {
-        this.player.anims.play("idleRight", true);
-      } else if (this.player.body.facing === directionEnum.UP) {
-        this.player.anims.play("idleUp", true);
-      } else if (this.player.body.facing === directionEnum.DOWN) {
-        this.player.anims.play("idleDown", true);
-      }
-    } else this.player.anims.stop();
   }
 }
