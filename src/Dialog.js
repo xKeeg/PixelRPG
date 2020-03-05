@@ -32,6 +32,7 @@ export class Dialog extends Phaser.Scene {
     // Stop scrolling with tilemap
     dialog.setScrollFactor(0);
 
+    // Stop the box being auto cancelled by repeat input
     this.input.keyboard.on(
       "keyup",
       function(event) {
@@ -40,7 +41,27 @@ export class Dialog extends Phaser.Scene {
       this
     );
 
-    // Set Delete Callback
+    this.input.on(
+      "pointerup",
+      function(event) {
+        this.keyReleased = true;
+      },
+      this
+    );
+
+    // Delete the scene when finished
+    this.input.on(
+      "pointerdown",
+      function(event) {
+        if (this.keyReleased != false) {
+          const mainScene = this.scene.get("WorldScene");
+          this.scene.remove("Dialog");
+          mainScene.toggleFocus();
+        }
+      },
+      this
+    );
+
     this.input.keyboard.on(
       "keydown",
       function(event) {

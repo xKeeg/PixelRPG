@@ -3,6 +3,7 @@ import playerSpritesheet from "./assets/RPG_assets.png";
 import TiledJSON from "./assets/map.json";
 import UIBox from "./assets/UI_box.png";
 import Adventurer from "./assets/Character 1.png";
+import InventoryTile from "./assets/InventoryTile.png";
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -12,6 +13,7 @@ export class BootScene extends Phaser.Scene {
   preload() {
     this.load.image("tiles", mapSpritesheet);
     this.load.image("UIbg", UIBox);
+    this.load.image("invTile", InventoryTile);
 
     this.load.tilemapTiledJSON("map", TiledJSON);
 

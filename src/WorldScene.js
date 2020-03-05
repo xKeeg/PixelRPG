@@ -1,6 +1,7 @@
 import { Player } from "./Player";
 import { Dialog } from "./Dialog";
 import { Progression } from "./Progression";
+import { Inventory } from "./Inventory";
 
 export class WorldScene extends Phaser.Scene {
   constructor() {
@@ -9,6 +10,7 @@ export class WorldScene extends Phaser.Scene {
 
   create() {
     this.Progress = new Progression();
+    this.Inventory = new Inventory();
     this.isPaused = false;
     // Map Stuff
     var map = this.make.tilemap({ key: "map" });
@@ -111,6 +113,8 @@ export class WorldScene extends Phaser.Scene {
     //   false,
     //   this
     // );
+    this.scene.add("Inventory", Inventory);
+    this.scene.launch("Inventory");
   }
 
   update() {
@@ -147,16 +151,43 @@ export class WorldScene extends Phaser.Scene {
   playerMovementHandler() {
     this.player.body.setVelocity(0);
 
+    // Get Center of visible screen
+    let centerX = this.cameras.main.displayWidth / 2;
+    let centerY = this.cameras.main.displayHeight / 2;
+
+    // If Player is offset centre of screen (edge of map) then recalibrate touch input
+    // TODO :: Currently handles top and left bounds, implement bottom and right bounds.
+
+    centerX = Math.min(centerX, this.player.x);
+    centerY = Math.min(centerY, this.player.y);
+
+    const inputSensitivity = 0.15;
+    const screen = {
+      left: centerX * (1 - inputSensitivity),
+      right: centerX * (1 + inputSensitivity),
+      up: centerY * (1 - inputSensitivity),
+      down: centerY * (1 + inputSensitivity)
+    };
+
+    var pointer = this.input.activePointer;
+    if (pointer.isDown) {
+      var touchX = pointer.x;
+      var touchY = pointer.y;
+    } else touchX = touchY = undefined;
+
+    // console.log("X: " + touchX);
+    // console.log("Y: " + touchY);
+
     if (!this.isPaused) {
-      if (this.cursors.left.isDown) {
+      if (this.cursors.left.isDown || touchX < screen.left) {
         this.player.body.setVelocityX(-80);
-      } else if (this.cursors.right.isDown) {
+      } else if (this.cursors.right.isDown || touchX > screen.right) {
         this.player.body.setVelocityX(80);
       }
 
-      if (this.cursors.up.isDown) {
+      if (this.cursors.up.isDown || touchY < screen.up) {
         this.player.body.setVelocityY(-80);
-      } else if (this.cursors.down.isDown) {
+      } else if (this.cursors.down.isDown || touchY > screen.down) {
         this.player.body.setVelocityY(80);
       }
 
