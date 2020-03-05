@@ -216,12 +216,15 @@ export class WorldScene extends Phaser.Scene {
 
   useItem(item) {
     let merchantTiles = this.interact.getTilesWithin(15, 5, 3, 3);
+    console.log(merchantTiles[0]);
+
+    let itemOffsetCamera = this.cameras.main.getWorldPoint(item.x, item.y);
 
     if (
-      item.x > merchantTiles[0].pixelX &&
-      item.y > merchantTiles[0].pixelY &&
-      item.x < merchantTiles[8].pixelX &&
-      item.y < merchantTiles[8].pixelY
+      itemOffsetCamera.x > merchantTiles[0].pixelX &&
+      itemOffsetCamera.y > merchantTiles[0].pixelY &&
+      itemOffsetCamera.x < merchantTiles[8].pixelX &&
+      itemOffsetCamera.y < merchantTiles[8].pixelY
     ) {
       return true;
     } else return false;
