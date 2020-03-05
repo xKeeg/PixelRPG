@@ -8,29 +8,11 @@ export class Inventory extends Phaser.Scene {
   create() {
     this.WorldScene = this.scene.get("WorldScene");
     this.input.on("pointerdown", this.startDrag, this);
+    this.tiles = this.add.container();
   }
 
   update() {
-    //// Draw Methods
-
-    // Positioning
-    const padding = 25;
-    const baseX = this.cameras.main.displayWidth - 20;
-    const baseY = 0 + 20;
-
-    // Set Draggable
-
-    // Draw items to screen
-    for (let i = 0; i < this.items.length; i++) {
-      // Background
-      this.add.image(baseX - padding * i, baseY, "invTile").setScale(1.5);
-
-      // Item Sprite
-      if (!this.items[i].isMoving) {
-        this.items[i].x = baseX - padding * i;
-        this.items[i].y = baseY;
-      }
-    }
+    this.drawInventory();
   }
 
   startDrag(pointer, targets) {
@@ -59,11 +41,46 @@ export class Inventory extends Phaser.Scene {
     this.dragObj.isMoving = false;
     this.input.off("pointermove", this.doDrag, this);
     this.input.off("pointerup", this.stopDrag, this);
+    if (this.successfullyUsesItem(this.dragObj)) {
+      this.dragObj.destroy();
+
+      // Update items list to reflect item use
+      const index = this.items.indexOf(targets[0]);
+      this.items.splice(index, 1);
+    }
     this.WorldScene.toggleFocus();
   }
 
   addItem(name, texture) {
     const item = new Item(this, name, texture);
     this.items.push(item);
+  }
+
+  // Helped function to pass to worldscene
+  successfullyUsesItem(item) {
+    if (this.WorldScene.useItem(item)) return true;
+    else return false;
+  }
+
+  drawInventory() {
+    this.tiles.removeAll(true);
+    const padding = 25;
+    const baseX = this.cameras.main.displayWidth - 20;
+    const baseY = 0 + 20;
+
+    // Draw items to screen
+    for (let i = 0; i < this.items.length; i++) {
+      // Background
+      let tile = this.add
+        .image(baseX - padding * i, baseY, "invTile")
+        .setScale(1.5);
+      this.tiles.add(tile);
+
+      // Item Sprite
+      if (!this.items[i].isMoving) {
+        this.items[i].x = baseX - padding * i;
+        this.items[i].y = baseY;
+      }
+    }
   }
 }
