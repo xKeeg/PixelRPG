@@ -223,11 +223,13 @@ export class WorldScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     this.player.anims.play("idleDown");
+    this.inventory.addItem("key", "tmp2");
   }
 
   useItem(item) {
     // Get the designated use location of the item
     const location = this.Progress.ItemUseLocations[item.name].useLocation;
+    const message = this.Progress.ItemUseLocations[item.name].useText;
 
     // Get the object from Progress
     const objLocation = this.Progress.Locations[location];
@@ -256,6 +258,8 @@ export class WorldScene extends Phaser.Scene {
       itemOffsetCamera.x < interactableTiles[count - 1].pixelX + 16 &&
       itemOffsetCamera.y < interactableTiles[count - 1].pixelY + 16
     ) {
+      this.dialogPrompt(message);
+      this.toggleFocus(true);
       return true;
     } else return false;
   }

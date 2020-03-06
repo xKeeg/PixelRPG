@@ -7,11 +7,13 @@ export class Progression {
     this.ItemUseLocations = {
       axe: {
         useLocation: "merchant",
-        singleUse: true
+        singleUse: true,
+        useText: "You swing the axe. It makes a grand THUD"
       },
       key: {
         useLocation: "chest_1",
-        singleUse: true
+        singleUse: true,
+        useText: "Luckily enough, this happned to be the right key!"
       }
     };
     this.Locations = {
