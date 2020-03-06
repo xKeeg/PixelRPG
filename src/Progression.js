@@ -2,7 +2,8 @@ export class Progression {
   constructor() {
     this.Story = {
       hasBegun: false,
-      caughtFish: false
+      caughtFish: false,
+      givenFish: false
     };
     this.ItemUseLocations = {
       axe: {
@@ -10,10 +11,18 @@ export class Progression {
         singleUse: true,
         useText: "You swing the axe. It makes a grand THUD"
       },
-      key: {
+      key_1: {
         useLocation: "chest_1",
         singleUse: true,
         useText: "Luckily enough, this happned to be the right key!"
+      },
+      fish: {
+        useLocation: "merchant",
+        singleUse: true,
+        useText: "You take the axe. It smells worse than the fish...",
+        rewardName: "axe",
+        rewardTexture: "axe",
+        storyStepEnd: "givenFish"
       }
     };
     this.Locations = {

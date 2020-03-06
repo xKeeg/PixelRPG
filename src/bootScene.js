@@ -5,7 +5,8 @@ import UIBox from "./assets/UI_box.png";
 import Adventurer from "./assets/Character 1.png";
 import InventoryTile from "./assets/InventoryTile.png";
 import axe from "./assets/axe.png";
-import tmp2 from "./assets/Door.png";
+import key1 from "./assets/key1.png";
+import fish from "./assets/fish.png";
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -17,7 +18,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image("UIbg", UIBox);
     this.load.image("invTile", InventoryTile);
     this.load.image("axe", axe);
-    this.load.image("tmp2", tmp2);
+    this.load.image("key1", key1);
+    this.load.image("fish", fish);
 
     this.load.tilemapTiledJSON("map", TiledJSON);
 

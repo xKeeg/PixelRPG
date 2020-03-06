@@ -192,6 +192,7 @@ export class WorldScene extends Phaser.Scene {
         this.dialogPrompt("You don't need this yet!");
       } else {
         this.dialogPrompt("You caught a fish! Yuk!");
+        this.inventory.addItem("fish", "fish");
         this.Progress.Story.caughtFish = true;
       }
     });
@@ -203,11 +204,11 @@ export class WorldScene extends Phaser.Scene {
 
     // Cart Merchant
     this.interact.setTileLocationCallback(15, 7, 3, 1, () => {
-      if (this.Progress.Story.caughtFish === false) {
+      // No Fish Caught
+      if (this.Progress.Story.givenFish === false) {
         this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
+        // Fish Can be given
       } else {
-        this.inventory.addItem("axe", "axe");
-        this.dialogPrompt("You take the axe. It smells worse than the fish...");
         this.interact.setTileLocationCallback(15, 7, 3, 1, null);
       }
     });
@@ -223,13 +224,14 @@ export class WorldScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     this.player.anims.play("idleDown");
-    this.inventory.addItem("key", "tmp2");
+    this.inventory.addItem("key_1", "key1");
   }
 
   useItem(item) {
     // Get the designated use location of the item
     const location = this.Progress.ItemUseLocations[item.name].useLocation;
     const message = this.Progress.ItemUseLocations[item.name].useText;
+    const cfg_item = this.Progress.ItemUseLocations[item.name];
 
     // Get the object from Progress
     const objLocation = this.Progress.Locations[location];
@@ -260,6 +262,12 @@ export class WorldScene extends Phaser.Scene {
     ) {
       this.dialogPrompt(message);
       this.toggleFocus(true);
+      if (cfg_item.rewardName != undefined) {
+        this.inventory.addItem(cfg_item.rewardName, cfg_item.rewardTexture);
+      }
+      if (cfg_item.storyStepEnd != undefined) {
+        this.Progress.Story[cfg_item.storyStepEnd] = true;
+      }
       return true;
     } else return false;
   }
