@@ -25,6 +25,12 @@ export class WorldScene extends Phaser.Scene {
 
     // Create Keyboard input
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.WASD = this.input.keyboard.addKeys({
+      W: Phaser.Input.Keyboard.KeyCodes.W,
+      A: Phaser.Input.Keyboard.KeyCodes.A,
+      S: Phaser.Input.Keyboard.KeyCodes.S,
+      D: Phaser.Input.Keyboard.KeyCodes.D
+    });
 
     // Set bounds to map width not screen width
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -33,9 +39,6 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
     this.player.createAnims(this);
-
-    this.inventory.addItem("axe", "tmp");
-    this.inventory.addItem("key", "tmp2");
   }
 
   update() {
@@ -94,10 +97,15 @@ export class WorldScene extends Phaser.Scene {
     // console.log("X: " + touchX);
     // console.log("Y: " + touchY);
 
-    const LEFT = this.cursors.left.isDown || touchX < screen.left;
-    const RIGHT = this.cursors.right.isDown || touchX > screen.right;
-    const UP = this.cursors.up.isDown || touchY < screen.up;
-    const DOWN = this.cursors.down.isDown || touchY > screen.down;
+    // Arrow Keys || Mouse/Touch || WASD
+    const LEFT =
+      this.cursors.left.isDown || touchX < screen.left || this.WASD.A.isDown;
+    const RIGHT =
+      this.cursors.right.isDown || touchX > screen.right || this.WASD.D.isDown;
+    const UP =
+      this.cursors.up.isDown || touchY < screen.up || this.WASD.W.isDown;
+    const DOWN =
+      this.cursors.down.isDown || touchY > screen.down || this.WASD.S.isDown;
 
     if (!this.isPaused) {
       if (LEFT) {
@@ -198,7 +206,7 @@ export class WorldScene extends Phaser.Scene {
       if (this.Progress.Story.caughtFish === false) {
         this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
       } else {
-        this.inventory.addItem("axe", "tmp");
+        this.inventory.addItem("axe", "axe");
         this.dialogPrompt("You take the axe. It smells worse than the fish...");
         this.interact.setTileLocationCallback(15, 7, 3, 1, null);
       }
@@ -213,6 +221,8 @@ export class WorldScene extends Phaser.Scene {
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
     this.player.setCollideWorldBounds(true);
+
+    this.player.anims.play("idleDown");
   }
 
   useItem(item) {

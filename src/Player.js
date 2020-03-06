@@ -13,6 +13,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.createAnims(scene);
   }
 
+  create() {}
+
   createAnims(scene) {
     scene.anims.create({
       key: "down",

@@ -64,7 +64,7 @@ export class Inventory extends Phaser.Scene {
 
   drawInventory() {
     this.tiles.removeAll(true);
-    const padding = 25;
+    const padding = 35;
     const baseX = this.cameras.main.displayWidth - 20;
     const baseY = 0 + 20;
 
@@ -73,7 +73,7 @@ export class Inventory extends Phaser.Scene {
       // Background
       let tile = this.add
         .image(baseX - padding * i, baseY, "invTile")
-        .setScale(1.5);
+        .setScale(0.9);
       this.tiles.add(tile);
 
       // Item Sprite
