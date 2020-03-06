@@ -1,5 +1,5 @@
 {
-  "name": "Phaser 3 Top Down RPG",
+  "name": "phaser3",
   "version": "1.1.0",
   "description": "A Phaser 3 Game developed for University",
   "main": "src/index.js",
