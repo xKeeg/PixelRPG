@@ -18,7 +18,8 @@ export class Dialog extends Phaser.Scene {
     const centerY = this.cameras.main.displayHeight / 2;
     const background = this.add
       .image(centerX, centerY * 1.5, "UIbg")
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5, 0.5)
+      .setVisible(false);
 
     // Font style
     const style = {
@@ -31,7 +32,8 @@ export class Dialog extends Phaser.Scene {
     const dialog = this.add
       .text(centerX, centerY * 1.5, text, style)
       // Centered on Box
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5, 0.5)
+      .setVisible(false);
 
     // Stop scrolling with tilemap
     dialog.setScrollFactor(0);
@@ -79,20 +81,28 @@ export class Dialog extends Phaser.Scene {
   delete() {
     this.keyReleased = false;
 
-    // Get pair of dialog items
+    // Get pair of dialog items at front of array
     if (this.dialogues.length != 0) {
-      const removedChild = this.dialogues.pop();
+      const removedChild = this.dialogues.shift();
 
       // Destroy them both
       removedChild.dialog.destroy();
       removedChild.background.destroy();
 
-      // Return control to main scene
-      this.WorldScene.toggleFocus();
+      // If no more dialog in queue
+      if (this.dialogues.length === 0)
+        // Return control to main scene
+        this.WorldScene.toggleFocus();
+    } else {
+      // Progress through the rest of dialogues
+      this.keyReleased = false;
     }
   }
 
   update() {
-    console.log(this.keyReleased);
+    if (this.dialogues.length != 0) {
+      this.dialogues[0].background.setVisible(true);
+      this.dialogues[0].dialog.setVisible(true);
+    }
   }
 }

@@ -39,8 +39,6 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
     this.player.createAnims(this);
-
-    this.dialogPrompt("tmp");
   }
 
   update() {
