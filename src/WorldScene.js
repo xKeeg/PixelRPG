@@ -45,6 +45,7 @@ export class WorldScene extends Phaser.Scene {
     this.playerMovementHandler();
   }
 
+  // Focus === Handles player input. Game logic still runs
   toggleFocus(force = false) {
     if (force) {
       this.isPaused = false;
@@ -70,7 +71,7 @@ export class WorldScene extends Phaser.Scene {
     centerY = Math.min(centerY, this.player.y);
 
     // Adjusts boundaries for touch input detection
-    const inputSensitivity = 0.15;
+    const inputSensitivity = 0.2;
     const screen = {
       left: centerX * (1 - inputSensitivity),
       right: centerX * (1 + inputSensitivity),
@@ -175,7 +176,6 @@ export class WorldScene extends Phaser.Scene {
     // Cross Bridge
     structures.setTileIndexCallback([267, 269], () => {
       this.dialogPrompt("The Cart Merchant calls you over...");
-      this.Progress.Story.hasBegun = true;
       structures.setTileIndexCallback([267, 269], null);
     });
 
@@ -187,6 +187,7 @@ export class WorldScene extends Phaser.Scene {
         this.dialogPrompt("You caught a fish! Yuk!");
         this.inventory.addItem("fish", "fish");
         this.Progress.Story.caughtFish = true;
+        this.interact.setTileLocationCallback(10, 13, 1, 1, null);
       }
     });
 
@@ -195,12 +196,16 @@ export class WorldScene extends Phaser.Scene {
       this.dialogPrompt("This isn't Kansas...");
     });
 
+    // Zone 1 Breakable Sign
+    this.interact.setTileLocationCallback(24, 11, 1, 1, () => {
+      this.dialogPrompt("This isn't Kansas...");
+    });
+
     // Cart Merchant
     this.interact.setTileLocationCallback(15, 7, 3, 1, () => {
-      // No Fish Caught
+      this.Progress.Story.hasBegun = true;
       if (this.Progress.Story.givenFish === false) {
         this.dialogPrompt("*OINK* Gimme fish. Get Axe!");
-        // Fish Can be given
       } else {
         this.interact.setTileLocationCallback(15, 7, 3, 1, null);
       }
@@ -224,9 +229,9 @@ export class WorldScene extends Phaser.Scene {
     // Get the designated use location of the item
     const location = this.Progress.ItemUseLocations[item.name].useLocation;
     const message = this.Progress.ItemUseLocations[item.name].useText;
-    const cfg_item = this.Progress.ItemUseLocations[item.name];
+    const usedItem = this.Progress.ItemUseLocations[item.name];
 
-    // Get the object from Progress
+    // Get place to use the item
     const objLocation = this.Progress.Locations[location];
 
     // Readability
@@ -255,28 +260,40 @@ export class WorldScene extends Phaser.Scene {
     ) {
       this.dialogPrompt(message);
       this.toggleFocus(true);
-      if (cfg_item.rewardName != undefined) {
-        this.inventory.addItem(cfg_item.rewardName, cfg_item.rewardTexture);
+      if (usedItem.rewardName != undefined) {
+        this.inventory.addItem(usedItem.rewardName, usedItem.rewardTexture);
       }
-      if (cfg_item.storyStepEnd != undefined) {
-        this.Progress.Story[cfg_item.storyStepEnd] = true;
+      if (usedItem.storyStepEnd != undefined) {
+        this.Progress.Story[usedItem.storyStepEnd] = true;
       }
-      if (cfg_item.callback != undefined) {
-        this.itemCallback(cfg_item.callback);
+      if (usedItem.callback != undefined) {
+        this.itemCallback(usedItem.callback, objLocation);
       }
-      return true;
+      if (usedItem.singleUse === true) return true;
+      else return false;
     } else return false;
   }
 
-  itemCallback(callback) {
+  itemCallback(callback, useLocation) {
     switch (callback) {
-      case "openChest1":
-        // this.interact.putTileAt(64, 1, 15); // Top left
-        // this.interact.putTileAt(65, 2, 15); // Top Right
-        this.interact.putTileAt(96, 1, 16); // Bottom Left
-        // this.interact.putTileAt(97, 2, 16); // Bottom Right
+      case "destroy":
+        let tiles = this.interact.getTilesWithin(
+          useLocation.x,
+          useLocation.y,
+          useLocation.width,
+          useLocation.height
+        );
+        for (let i = 0; i < tiles.length; i++) {
+          this.interact.removeTileAt(tiles[i].x, tiles[i].y);
+        }
+        this.interact.setTileLocationCallback(
+          useLocation.x,
+          useLocation.y,
+          useLocation.width,
+          useLocation.height,
+          null
+        );
         break;
-
       default:
         break;
     }

@@ -95,7 +95,6 @@ export class Dialog extends Phaser.Scene {
         this.WorldScene.toggleFocus();
     } else {
       // Progress through the rest of dialogues
-      this.keyReleased = false;
     }
   }
 
