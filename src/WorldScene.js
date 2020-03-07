@@ -1,7 +1,5 @@
 import { Player } from "./Player";
-import { Dialog } from "./Dialog";
 import { Progression } from "./Progression";
-import { Tilemaps } from "phaser";
 
 export class WorldScene extends Phaser.Scene {
   constructor() {
@@ -9,9 +7,11 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
-    // Get handle to and launch Inventory
+    // Get handle to and launch Overlay Scenes
     this.inventory = this.scene.get("Inventory");
+    this.dialog = this.scene.get("Dialog");
     this.scene.launch("Inventory");
+    this.scene.launch("Dialog");
 
     // Get Story Info
     this.Progress = new Progression();
@@ -39,6 +39,8 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
     this.player.createAnims(this);
+
+    this.dialogPrompt("tmp");
   }
 
   update() {
@@ -52,15 +54,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   dialogPrompt(text) {
-    // Create a Dialogue Box
-    const dialogBox = new Dialog(text);
-    this.scene.add("Dialog", dialogBox);
-
-    // Set game is Paused
+    this.dialog.addDialog(text);
     this.isPaused = true;
-
-    // Draw Dialog Ovelay
-    this.scene.launch("Dialog");
   }
 
   playerMovementHandler() {
@@ -159,7 +154,7 @@ export class WorldScene extends Phaser.Scene {
     var groundDeco = map.createStaticLayer("GroundDeco", tiles, 0, 0);
     var water = map.createStaticLayer("Water", tiles, 0, 0);
     var structures = map.createStaticLayer("Structures", tiles, 0, 0);
-    this.interact = map.createStaticLayer("Interact", tiles, 0, 0);
+    this.interact = map.createDynamicLayer("Interact", tiles, 0, 0);
     var decorations = map.createStaticLayer("Decoration", tiles, 0, 0);
     this.player = new Player(this, 100, 120);
     var fringe = map.createStaticLayer("Fringe", tiles, 0, 0);
@@ -268,7 +263,24 @@ export class WorldScene extends Phaser.Scene {
       if (cfg_item.storyStepEnd != undefined) {
         this.Progress.Story[cfg_item.storyStepEnd] = true;
       }
+      if (cfg_item.callback != undefined) {
+        this.itemCallback(cfg_item.callback);
+      }
       return true;
     } else return false;
+  }
+
+  itemCallback(callback) {
+    switch (callback) {
+      case "openChest1":
+        // this.interact.putTileAt(64, 1, 15); // Top left
+        // this.interact.putTileAt(65, 2, 15); // Top Right
+        this.interact.putTileAt(96, 1, 16); // Bottom Left
+        // this.interact.putTileAt(97, 2, 16); // Bottom Right
+        break;
+
+      default:
+        break;
+    }
   }
 }

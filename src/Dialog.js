@@ -1,16 +1,21 @@
 export class Dialog extends Phaser.Scene {
-  constructor(text = "") {
+  constructor() {
     super("Dialog");
-    this.text = text;
+    this.dialogues = [];
   }
 
   create() {
+    // Handle to main scene
+    this.WorldScene = this.scene.get("WorldScene");
+
+    // Ensure that keydown movement does not auto-skip dialogue
+    this.keyReleased = false;
+  }
+
+  addDialog(text) {
+    // Positioning
     const centerX = this.cameras.main.displayWidth / 2;
     const centerY = this.cameras.main.displayHeight / 2;
-
-    this.keyReleased = false;
-
-    // Draw Dialogue Background Box
     const background = this.add
       .image(centerX, centerY * 1.5, "UIbg")
       .setOrigin(0.5, 0.5);
@@ -23,14 +28,15 @@ export class Dialog extends Phaser.Scene {
       wordWrap: { width: background.displayWidth * 0.94, useAdvancedWrap: true }
     };
 
-    // Draw Text to box
     const dialog = this.add
-      .text(centerX, centerY * 1.5, this.text, style)
+      .text(centerX, centerY * 1.5, text, style)
       // Centered on Box
       .setOrigin(0.5, 0.5);
 
     // Stop scrolling with tilemap
     dialog.setScrollFactor(0);
+
+    this.dialogues.push({ dialog, background });
 
     // Stop the box being auto cancelled by repeat input
     this.input.keyboard.on(
@@ -49,14 +55,11 @@ export class Dialog extends Phaser.Scene {
       this
     );
 
-    // Delete the scene when finished
     this.input.on(
       "pointerdown",
       function(event) {
         if (this.keyReleased != false) {
-          const mainScene = this.scene.get("WorldScene");
-          this.scene.remove("Dialog");
-          mainScene.toggleFocus();
+          this.delete();
         }
       },
       this
@@ -66,12 +69,30 @@ export class Dialog extends Phaser.Scene {
       "keydown",
       function(event) {
         if (this.keyReleased != false) {
-          const mainScene = this.scene.get("WorldScene");
-          this.scene.remove("Dialog");
-          mainScene.toggleFocus();
+          this.delete();
         }
       },
       this
     );
+  }
+
+  delete() {
+    this.keyReleased = false;
+
+    // Get pair of dialog items
+    if (this.dialogues.length != 0) {
+      const removedChild = this.dialogues.pop();
+
+      // Destroy them both
+      removedChild.dialog.destroy();
+      removedChild.background.destroy();
+
+      // Return control to main scene
+      this.WorldScene.toggleFocus();
+    }
+  }
+
+  update() {
+    console.log(this.keyReleased);
   }
 }

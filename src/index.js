@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { BootScene } from "./bootScene";
 import { WorldScene } from "./WorldScene";
 import { Inventory } from "./Inventory";
+import { Dialog } from "./Dialog";
 
 var config = {
   type: Phaser.CANVAS,
@@ -23,7 +24,7 @@ var config = {
       debug: false
     }
   },
-  scene: [BootScene, WorldScene, Inventory]
+  scene: [BootScene, WorldScene, Inventory, Dialog]
 };
 
 var game = new Phaser.Game(config);

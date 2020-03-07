@@ -14,7 +14,8 @@ export class Progression {
       key_1: {
         useLocation: "chest_1",
         singleUse: true,
-        useText: "Luckily enough, this happned to be the right key!"
+        useText: "Luckily enough, this happned to be the right key!",
+        callback: "openChest1"
       },
       fish: {
         useLocation: "merchant",
@@ -34,9 +35,9 @@ export class Progression {
       },
       chest_1: {
         x: 1,
-        y: 16,
+        y: 15,
         width: 2,
-        height: 1
+        height: 2
       }
     };
   }
