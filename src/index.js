@@ -3,6 +3,7 @@ import { BootScene } from "./bootScene";
 import { WorldScene } from "./WorldScene";
 import { Inventory } from "./Inventory";
 import { Dialog } from "./Dialog";
+import { TitleScreen } from "./Title";
 
 var config = {
   type: Phaser.CANVAS,
@@ -21,10 +22,10 @@ var config = {
     default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: false
+      debug: true
     }
   },
-  scene: [BootScene, WorldScene, Inventory, Dialog]
+  scene: [BootScene, TitleScreen, WorldScene, Inventory, Dialog]
 };
 
 var game = new Phaser.Game(config);

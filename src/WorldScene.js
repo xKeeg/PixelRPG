@@ -198,7 +198,8 @@ export class WorldScene extends Phaser.Scene {
 
     // Zone 1 Breakable Sign
     this.interact.setTileLocationCallback(24, 11, 1, 1, () => {
-      this.dialogPrompt("This isn't Kansas...");
+      this.dialogPrompt("This looks like it could be broken...");
+      this.dialogPrompt("If only you had something strong enough!");
     });
 
     // Cart Merchant
@@ -215,6 +216,17 @@ export class WorldScene extends Phaser.Scene {
     this.interact.setTileLocationCallback(1, 16, 2, 1, () => {
       this.dialogPrompt("LOCKED! *Gotta find the key!*");
     });
+    // Zone 1 Hint
+    this.interact.setTileLocationCallback(3, 17, 1, 1, () => {
+      this.dialogPrompt("To open this you simply need tap your heels thrice");
+      this.dialogPrompt("Find me just north of where you entered this life");
+    });
+    // Zone 1 Key
+    this.interact.setTileLocationCallback(2, 0, 1, 1, () => {
+      this.inventory.addItem("key_1", "key1");
+      this.dialogPrompt("You find an oddly shaped key, what could it open...");
+      this.interact.setTileLocationCallback(2, 0, 1, 1, null);
+    });
 
     // Setup world size
     this.physics.world.bounds.width = map.widthInPixels;
@@ -222,7 +234,6 @@ export class WorldScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
 
     this.player.anims.play("idleDown");
-    this.inventory.addItem("key_1", "key1");
   }
 
   useItem(item) {

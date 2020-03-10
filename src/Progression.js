@@ -8,7 +8,7 @@ export class Progression {
     this.ItemUseLocations = {
       axe: {
         useLocation: "zone_1_sign_break",
-        singleUse: false,
+        singleUse: true,
         useText: "You swing the axe. It makes a grand THUD",
         callback: "destroy"
       },
@@ -16,7 +16,9 @@ export class Progression {
         useLocation: "chest_1",
         singleUse: true,
         useText: "Luckily enough, this happened to be the right key!",
-        callback: "destroy"
+        callback: "destroy",
+        rewardName: "sword_1",
+        rewardTexture: "sword1"
       },
       fish: {
         useLocation: "merchant",
@@ -25,6 +27,11 @@ export class Progression {
         rewardName: "axe",
         rewardTexture: "axe",
         storyStepEnd: "givenFish"
+      },
+      sword_1: {
+        useLocation: "merchant",
+        singleUse: false,
+        useText: "One deft swing and it dies. Wow!"
       }
     };
     this.Locations = {
