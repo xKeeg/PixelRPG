@@ -6,7 +6,6 @@ import TiledJSON from "./assets/map.json";
 // Static Elements
 import UIBox from "./assets/UI_box.png";
 import InventoryTile from "./assets/InventoryTile.png";
-import TitleText from "./assets/GameTitle.png";
 import TitleBG from "./assets/titleBG.png";
 import TitlePlayBtn from "./assets/PLAYbtn.png";
 
@@ -27,7 +26,6 @@ export class BootScene extends Phaser.Scene {
   preload() {
     this.load.image("tiles", mapSpritesheet);
     this.load.image("UIbg", UIBox);
-    this.load.image("TitleText", TitleText);
     this.load.image("TitleBG", TitleBG);
     this.load.image("TitlePlayBtn", TitlePlayBtn);
     this.load.image("invTile", InventoryTile);

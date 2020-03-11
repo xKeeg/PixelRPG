@@ -3,22 +3,61 @@ export class TitleScreen extends Phaser.Scene {
     super("TitleScene");
   }
   create() {
-    let centerX = this.cameras.main.displayWidth / 2;
-    let centerY = this.cameras.main.displayHeight / 2;
+    this.centerX = this.cameras.main.displayWidth / 2;
+    this.centerY = this.cameras.main.displayHeight / 2;
 
     this.createBG();
+    this.createTitle();
 
-    this.gameTitle = this.add
-      .sprite(centerX, centerY / 2, "TitleText")
-      .setScale(0.5);
-
+    const playBtn = this.add.sprite(this.centerX, this.centerY, "TitlePlayBtn");
+    playBtn.setScale(0.5).setInteractive();
+    playBtn.on(
+      "pointerover",
+      function() {
+        playBtn.setScale(0.6);
+      },
+      this
+    );
+    playBtn.on(
+      "pointerout",
+      function() {
+        playBtn.setScale(0.5);
+      },
+      this
+    );
+    playBtn.on(
+      "pointerdown",
+      function() {
+        this.scene.launch("WorldScene");
+      },
+      this
+    );
     // Do stuff
-
-    this.scene.launch("WorldScene");
   }
 
   update() {}
 
+  createTitle() {
+    const style = {
+      color: "#000",
+      fontSize: 30,
+      fontFamilt: "Impact",
+      align: "center",
+      stroke: "#fff",
+      strokeThickness: 5,
+      shadowFill: true,
+      shadowColor: "#000",
+      shadowStroke: true
+    };
+
+    const gameTitle = this.add.text(
+      this.centerX,
+      this.centerY / 2,
+      "Working Title",
+      style
+    );
+    gameTitle.setOrigin(0.5);
+  }
   createBG() {
     // Render the map as a background (resource intensive????)
 
