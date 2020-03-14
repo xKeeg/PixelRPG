@@ -6,7 +6,23 @@ export class Progression {
       givenFish: false
     };
     this.ItemUseLocations = {
-      axe: {
+      /*
+  
+      *-* TEMPLATE *-*
+
+      Callbacks:
+        "destroy" : Unconditionally destroys the location that it is used on
+
+      itemName: {
+        useLocation: Location Key (Locations listed below)
+        singleUse: Does the item destroy on use
+        useText: Dialog to be shown when item is used (Restricted to one dialog box
+        callback: See Above for all possible callbacks
+        rewardName: Item to give player with when used correctly.
+        rewardTexture: Item Texture for above
+        storyStepEnd: Story step to mark as complete (above => this.Story{...}   ) 
+      }
+*/ axe: {
         useLocation: "zone_1_sign_break",
         singleUse: true,
         useText: "You swing the axe. It makes a grand THUD",
