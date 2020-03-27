@@ -8,20 +8,40 @@ export class TitleScreen extends Phaser.Scene {
 
     this.createBG();
     this.createTitle();
+    this.createPlayBtn();
+    this.ShowInstructions();
+  }
 
-    const playBtn = this.add.sprite(this.centerX, this.centerY, "TitlePlayBtn");
-    playBtn.setScale(0.5).setInteractive();
+  update() {}
+
+  createPlayBtn() {
+    const style = {
+      color: "#000",
+      fontSize: 20,
+      fontFamily: "Impact",
+      align: "center",
+      stroke: "#fff",
+      strokeThickness: 2,
+      shadowFill: true,
+      shadowColor: "#000",
+      shadowStroke: true
+    };
+
+    const playBtn = this.add.text(this.centerX, this.centerY, "Play", style);
+    playBtn.setOrigin(0.5);
+
+    playBtn.setInteractive();
     playBtn.on(
       "pointerover",
       function() {
-        playBtn.setScale(0.6);
+        playBtn.setScale(1.2);
       },
       this
     );
     playBtn.on(
       "pointerout",
       function() {
-        playBtn.setScale(0.5);
+        playBtn.setScale(1);
       },
       this
     );
@@ -32,19 +52,18 @@ export class TitleScreen extends Phaser.Scene {
       },
       this
     );
-    // Do stuff
   }
 
-  update() {}
+  ShowInstructions() {}
 
   createTitle() {
     const style = {
       color: "#000",
       fontSize: 30,
-      fontFamilt: "Impact",
+      fontFamily: "Impact",
       align: "center",
       stroke: "#fff",
-      strokeThickness: 5,
+      strokeThickness: 4,
       shadowFill: true,
       shadowColor: "#000",
       shadowStroke: true

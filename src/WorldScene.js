@@ -39,6 +39,21 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player);
     this.cameras.main.roundPixels = true;
     this.player.createAnims(this);
+
+    this.dialogPrompt(
+      "Welcome to Working Title!\nPress any key to continue..."
+    );
+    this.dialogPrompt(
+      "As you walk around and explore, pay attention to your surroundings!"
+    );
+    this.dialogPrompt("There are things everywhere to interact with!");
+    this.dialogPrompt(
+      "To use an item drag the icon to the place you think it should be used"
+    );
+    this.dialogPrompt("The faster you finish the game, the higher the score!");
+    this.dialogPrompt("Good luck!");
+
+    // Start timer
   }
 
   update() {
